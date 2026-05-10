@@ -21,9 +21,6 @@ public class ItemSplitManager : MonoBehaviour
     [SerializeField] private Button confirmButton;
     [SerializeField] private Button cancelButton;
     
-    [Header("Input Blocker")]
-    [SerializeField] private GameObject inputBlocker; // 투명한 전체 화면 배경
-    
     [Header("Debug")]
     [SerializeField] private bool showDebugLogs = false;
     #endregion
