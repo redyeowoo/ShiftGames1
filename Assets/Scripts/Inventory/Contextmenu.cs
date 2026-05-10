@@ -51,7 +51,7 @@ public class ContextMenu : MonoBehaviour
     [Header("재료 메뉴 버튼")]
     [SerializeField] private Button discardButton5;
     
-    [Header("인벤토리 재료 메뉴 버튼")]
+    [Header("인벤토리 요리 재료 메뉴 버튼")]
     [SerializeField] private Button addToCookingButton;
     [SerializeField] private Button discardButton6;
     
@@ -59,9 +59,13 @@ public class ContextMenu : MonoBehaviour
     [SerializeField] private Button removeFromCookingButton;
     [SerializeField] private Button discardButton7;
 
+    [Header("인벤토리 포션 재료 메뉴 버튼")]
+    [SerializeField] private Button addToPotionButton;
+    [SerializeField] private Button discardButton8;
+
     [Header("포션 슬롯 메뉴 버튼")]
     [SerializeField] private Button removeFromPotionButton;
-    [SerializeField] private Button discardButton8;
+    [SerializeField] private Button discardButton9;
     
     [Header("전리품 메뉴 버튼")]
     [SerializeField] private Button transferToInventoryButton;
@@ -159,17 +163,21 @@ public class ContextMenu : MonoBehaviour
         // 재료 메뉴
         RegisterButtonSafe(discardButton5, () => ShowConfirmDialog("정말 버리시겠습니까?"));
         
-        // 인벤토리 재료 메뉴
+        // 인벤토리 요리 재료 메뉴
         RegisterButtonSafe(addToCookingButton, OnAddToCookingButtonClicked);
         RegisterButtonSafe(discardButton6, () => ShowConfirmDialog("정말 버리시겠습니까?"));
         
         // 요리 슬롯 메뉴
         RegisterButtonSafe(removeFromCookingButton, OnRemoveFromCookingButtonClicked);
         RegisterButtonSafe(discardButton7, () => ShowConfirmDialog("정말 버리시겠습니까?"));
+
+        // 인벤토리 포션 재료 메뉴
+        RegisterButtonSafe(addToPotionButton, () => OnAddToPotionButtonClicked());
+        RegisterButtonSafe(discardButton8, () => ShowConfirmDialog("정말 버리시겠습니까?"));
         
         // 포션 슬롯 메뉴
         RegisterButtonSafe(removeFromPotionButton, OnRemoveFromPotionButtonClicked);
-        RegisterButtonSafe(discardButton8, () => ShowConfirmDialog("정말 버리시겠습니까?"));
+        RegisterButtonSafe(discardButton9, () => ShowConfirmDialog("정말 버리시겠습니까?"));
         
         // 전리품 메뉴
         RegisterButtonSafe(transferToInventoryButton, OnTransferToInventoryButtonClicked);
@@ -550,7 +558,7 @@ public class ContextMenu : MonoBehaviour
         
         bool success = CookingManager.Instance.TryAddIngredient(ingredient, targetSlot);
         
-                        CloseMenu();
+        CloseMenu();
     }
     
     private void OnRemoveFromCookingButtonClicked()
@@ -566,6 +574,33 @@ public class ContextMenu : MonoBehaviour
                 CloseMenu();
     }
 
+    private void OnAddToPotionButtonClicked()
+    {
+        if (targetSlot == null || targetSlot.currentItem == null)
+        {
+            CloseMenu();
+            return;
+        }
+        
+        ItemData ingredient = targetSlot.currentItem;
+        
+        if (ingredient.itemType != ItemType.Ingredient)
+        {
+            CloseMenu();
+            return;
+        }
+        
+        if (PotionManager.Instance == null)
+        {
+            CloseMenu();
+            return;
+        }
+        
+        bool success = PotionManager.Instance.TryAddIngredient(ingredient, targetSlot);
+        
+        CloseMenu();
+    }
+
     private void OnRemoveFromPotionButtonClicked()
     {
         if (!IsValidTargetSlot()) return;
@@ -576,7 +611,7 @@ public class ContextMenu : MonoBehaviour
         {
             TransferItem(targetSlot, emptySlot);
         }
-                CloseMenu();
+        CloseMenu();
     }
     
     private void OnTransferToInventoryButtonClicked()
