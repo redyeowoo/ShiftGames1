@@ -241,45 +241,41 @@ public class ContextMenu : MonoBehaviour
     private MenuType DetermineMenuType(SlotUI slot)
     {
         if (IsLootSlot(slot))
-        {
             return MenuType.Loot;
-        }
         
         // 1. 요리 슬롯
         if (slot.slotType == SlotType.Cooking)
             return MenuType.CookingSlot;
         
-        // 1-1. 재료 아이템
-        if (slot.currentItem.itemType == ItemType.Ingredient)
-        {
-            bool isCookingOpen = CookingManager.Instance != null && CookingManager.Instance.IsCookingOpen();
-            return isCookingOpen ? MenuType.CookingIngredient : MenuType.Ingredient;
-        }
-
         // 2. 포션 슬롯
         if (slot.slotType == SlotType.Potion)
             return MenuType.PotionSlot;
         
-        // 2-2. 재료 아이템
+        // 3. 재료 아이템 — 어떤 창이 열려 있는지 함께 체크
         if (slot.currentItem.itemType == ItemType.Ingredient)
         {
+            bool isCookingOpen = CookingManager.Instance != null && CookingManager.Instance.IsCookingOpen();
+            if (isCookingOpen) return MenuType.CookingIngredient;
+            
             bool isPotionOpen = PotionManager.Instance != null && PotionManager.Instance.IsPotionOpen();
-            return isPotionOpen ? MenuType.PotionIngredient : MenuType.Ingredient;
+            if (isPotionOpen) return MenuType.PotionIngredient;
+            
+            return MenuType.Ingredient;
         }
         
-        // 3. 퀵슬롯 소비 아이템
+        // 4. 퀵슬롯 소비 아이템
         if (IsQuickSlotConsumable(slot))
             return MenuType.QuickSlot;
         
-        // 4. 장비 슬롯
+        // 5. 장비 슬롯
         if (slot.slotType == SlotType.Equipment)
             return MenuType.Unequipment;
         
-        // 5. 인벤토리 소비 아이템
+        // 6. 인벤토리 소비 아이템
         if (slot.slotType == SlotType.Inventory && slot.currentItem.itemType == ItemType.Consumable)
             return MenuType.Consumable;
         
-        // 6. 기본: 장비 메뉴
+        // 7. 기본: 장비 메뉴
         return MenuType.Equipment;
     }
     
@@ -431,6 +427,12 @@ public class ContextMenu : MonoBehaviour
         if (confirmPanel != null && confirmPanel.activeSelf) return;
         if (!IsAnyMenuActive()) return;
         
+        if (Input.GetKeyDown(KeyCode.Escape))
+        {
+            CloseMenu();
+            return;
+        }
+
         if (Input.GetKeyDown(KeyCode.I))
         {
             if (targetSlotType == SlotType.Inventory && !IsLootSlot(targetSlot))
